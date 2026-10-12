@@ -1,0 +1,18 @@
+services:
+  api:
+    build: .
+    ports: ["127.0.0.1:8000:8000"]
+    volumes:
+      - ./data/gold:/app/data/gold:ro
+      - ./artifacts:/app/artifacts:ro
+    environment:
+      REPORT_PATH: /app/artifacts/latest.json
+      GOLD_PATH: /app/data/gold/warehouse_costs.parquet
+      LLM_MODE: mock
+  dashboard:
+    build: .
+    command: ["streamlit","run","frontend/app.py","--server.address","0.0.0.0","--server.port","8501"]
+    environment:
+      API_URL: http://api:8000
+    ports: ["127.0.0.1:8501:8501"]
+    depends_on: [api]
